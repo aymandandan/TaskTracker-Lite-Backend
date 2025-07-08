@@ -12,14 +12,12 @@ This is the backend for TaskTracker Lite, a full-stack task management applicati
 
 - **Task Management**
   - CRUD operations for tasks
-  - Task filtering and sorting
+  - Task filtering, sorting and search
   - Data validation and sanitization
-  - Pagination support
 
 - **Security**
   - Rate limiting
   - Data sanitization
-  - Helmet for secure HTTP headers
   - CORS protection
   - XSS protection
 
@@ -39,8 +37,7 @@ This is the backend for TaskTracker Lite, a full-stack task management applicati
 
 1. **Clone the repository** (if you haven't already)
    ```bash
-   git clone https://github.com/yourusername/tasktracker-lite.git
-   cd tasktracker-lite/server
+   git clone https://github.com/aymandandan/tasktracker-lite.git
    ```
 
 2. **Install dependencies**
@@ -95,48 +92,6 @@ This is the backend for TaskTracker Lite, a full-stack task management applicati
 - `npm run lint:fix` - Fix linting issues
 - `npm run format` - Format code with Prettier
 
-## 📁 Project Structure
-
-```
-server/
-  ├── config/           # Configuration files
-  │   └── db.js        # Database connection
-  │
-  ├── controllers/      # Route controllers
-  │   ├── authController.js
-  │   └── taskController.js
-  │
-  ├── middlewares/      # Custom middlewares
-  │   ├── auth.js      # Authentication middleware
-  │   └── error.js     # Error handling middleware
-  │
-  ├── models/           # Mongoose models
-  │   ├── User.js
-  │   └── Task.js
-  │
-  ├── routes/           # API routes
-  │   ├── authRoutes.js
-  │   └── taskRoutes.js
-  │
-  ├── services/         # Business logic
-  │   ├── authService.js
-  │   └── taskService.js
-  │
-  ├── utils/            # Utility functions
-  │   ├── apiFeatures.js
-  │   └── appError.js
-  │
-  ├── validators/       # Request validation
-  │   ├── authValidators.js
-  │   └── taskValidators.js
-  │
-  ├── .env              # Environment variables
-  ├── .eslintrc.js      # ESLint configuration
-  ├── .prettierrc       # Prettier configuration
-  ├── index.js          # Application entry point
-  └── package.json      # Project dependencies
-```
-
 ## 🛠️ Tech Stack
 
 ### Core
@@ -147,7 +102,6 @@ server/
 ### Authentication & Security
 - JSON Web Tokens (JWT)
 - bcrypt for password hashing
-- Helmet for secure HTTP headers
 - Express Rate Limit
 - Express Validator
 - Express Mongo Sanitize
@@ -156,7 +110,7 @@ server/
 ### Development Tools
 - Nodemon for development
 - ESLint + Prettier for code quality
-- Jest + Supertest for testing
+- Jest for testing
 - Swagger/OpenAPI for API documentation
 
 ## 🧪 Testing
