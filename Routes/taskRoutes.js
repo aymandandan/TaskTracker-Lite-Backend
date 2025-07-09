@@ -13,23 +13,46 @@ const {
 // Apply protect middleware to all routes
 router.use(protect);
 
+// Debug middleware to log request details
+router.use((req, res, next) => {
+  console.log('Request Headers:', req.headers);
+  console.log('Request Body:', req.body);
+  console.log('Request Query:', req.query);
+  next();
+});
+
 // @route   POST /api/tasks
 // @desc    Create a new task
 // @access  Private
-router.post(
-  '/',
-  [
-    check('title', 'Title is required').not().isEmpty().trim().escape(),
-    check('description', 'Description is too long').optional().trim().escape().isLength({ max: 1000 }),
-    check('dueDate', 'Please provide a valid due date').isISO8601().toDate(),
-    check('priority', 'Priority must be low, medium, or high')
-      .optional({ checkFalsy: true })
-      .isIn(['low', 'medium', 'high'])
-      .withMessage('Priority must be low, medium, or high')
-      .customSanitizer(value => value ? value.toLowerCase() : 'medium')
-  ],
-  createTask
-);
+// Custom middleware to validate task creation
+const validateTaskCreation = [
+  check('title', 'Title is required').not().isEmpty().trim().escape(),
+  check('description', 'Description is too long').optional().trim().escape().isLength({ max: 1000 }),
+  check('dueDate', 'Please provide a valid due date').isISO8601().toDate(),
+  (req, res, next) => {
+    // Only validate priority if it exists in the request body
+    if (req.body.priority) {
+      const priority = req.body.priority.toString().toLowerCase();
+      if (!['low', 'medium', 'high'].includes(priority)) {
+        return res.status(400).json({
+          errors: [{
+            msg: 'Priority must be low, medium, or high',
+            param: 'priority',
+            location: 'body'
+          }]
+        });
+      }
+      // Sanitize the priority
+      req.body.priority = priority;
+    } else {
+      // Set default priority if not provided
+      req.body.priority = 'medium';
+    }
+    next();
+  }
+];
+
+router.post('/', validateTaskCreation, createTask);
 
 // @route   GET /api/tasks
 // @desc    Get all tasks for the logged-in user
