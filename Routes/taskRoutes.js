@@ -22,7 +22,11 @@ router.post(
     check('title', 'Title is required').not().isEmpty().trim().escape(),
     check('description', 'Description is too long').optional().trim().escape().isLength({ max: 1000 }),
     check('dueDate', 'Please provide a valid due date').isISO8601().toDate(),
-    check('priority', 'Priority must be low, medium, or high').optional().isIn(['low', 'medium', 'high'])
+    check('priority', 'Priority must be low, medium, or high')
+      .optional({ checkFalsy: true })
+      .isIn(['low', 'medium', 'high'])
+      .withMessage('Priority must be low, medium, or high')
+      .customSanitizer(value => value ? value.toLowerCase() : 'medium')
   ],
   createTask
 );
