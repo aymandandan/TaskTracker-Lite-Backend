@@ -13,14 +13,6 @@ const {
 // Apply protect middleware to all routes
 router.use(protect);
 
-// Debug middleware to log request details
-router.use((req, res, next) => {
-  console.log('Request Headers:', req.headers);
-  console.log('Request Body:', req.body);
-  console.log('Request Query:', req.query);
-  next();
-});
-
 // @route   POST /api/tasks
 // @desc    Create a new task
 // @access  Private
@@ -62,17 +54,33 @@ router.get('/', getTasks);
 // @route   PUT /api/tasks/:id
 // @desc    Update a task
 // @access  Private
-router.put(
-  '/:id',
-  [
-    check('title', 'Title is required').optional().not().isEmpty().trim().escape(),
-    check('description', 'Description is too long').optional().trim().escape().isLength({ max: 1000 }),
-    check('dueDate', 'Invalid due date').optional().isISO8601(),
-    check('priority', 'Invalid priority').optional().isIn(['low', 'medium', 'high']),
-    check('completed', 'Completed must be a boolean').optional().isBoolean()
-  ],
-  updateTask
-);
+// Custom middleware to validate task update
+const validateTaskUpdate = [
+  check('title', 'Title is required').optional().not().isEmpty().trim().escape(),
+  check('description', 'Description is too long').optional().trim().escape().isLength({ max: 1000 }),
+  check('dueDate', 'Invalid due date').optional().isISO8601(),
+  check('completed', 'Completed must be a boolean').optional().isBoolean(),
+  (req, res, next) => {
+    // Only validate priority if it exists in the request body
+    if (req.body.priority) {
+      const priority = req.body.priority.toString().toLowerCase();
+      if (!['low', 'medium', 'high'].includes(priority)) {
+        return res.status(400).json({
+          errors: [{
+            msg: 'Priority must be low, medium, or high',
+            param: 'priority',
+            location: 'body'
+          }]
+        });
+      }
+      // Sanitize the priority
+      req.body.priority = priority;
+    }
+    next();
+  }
+];
+
+router.put('/:id', validateTaskUpdate, updateTask);
 
 // @route   DELETE /api/tasks/:id
 // @desc    Delete a task
